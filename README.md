@@ -26,7 +26,7 @@ The project was completed by a five-person team:
 
 | Team member |
 | --- |
-| Adrian |
+| Adrian Ortiz |
 | Kevin Ibarra |
 | Alejandro Lopez |
 | Alexis Traverso |
