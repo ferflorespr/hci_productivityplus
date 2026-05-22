@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:productivity_plus/main.dart';
@@ -13,9 +12,10 @@ void main() {
     expect(find.text('Goals'), findsOneWidget);
     expect(find.text('Analytics'), findsOneWidget);
 
-    // Tapping a tab switches the AppBar title.
+    // Tapping a tab swaps the page heading inside the body.
+    // After tapping, "Journal" appears twice: nav label + page heading.
     await tester.tap(find.text('Journal'));
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(AppBar, 'Journal'), findsOneWidget);
+    expect(find.text('Journal'), findsNWidgets(2));
   });
 }
