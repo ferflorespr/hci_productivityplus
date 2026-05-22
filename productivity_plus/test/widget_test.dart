@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:productivity_plus/main.dart';
@@ -17,5 +18,16 @@ void main() {
     await tester.tap(find.text('Journal'));
     await tester.pumpAndSettle();
     expect(find.text('Journal'), findsNWidgets(2));
+  });
+
+  testWidgets('Habits FAB opens the create-habit screen', (tester) async {
+    await tester.pumpWidget(const ProductivityPlusApp());
+
+    expect(find.byIcon(Icons.add), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New Habit'), findsOneWidget);
   });
 }
