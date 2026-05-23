@@ -3,17 +3,23 @@ import 'package:flutter/material.dart';
 import '../models/habit.dart';
 import '../widgets/habit_form.dart';
 
-class CreateHabitPage extends StatelessWidget {
-  const CreateHabitPage({super.key, required this.onSubmit});
+class EditHabitPage extends StatelessWidget {
+  const EditHabitPage({
+    super.key,
+    required this.habit,
+    required this.onSubmit,
+  });
 
+  final Habit habit;
   final void Function(Habit) onSubmit;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Habit')),
+      appBar: AppBar(title: const Text('Edit Habit')),
       body: HabitForm(
-        submitLabel: 'Create Habit',
+        initial: habit,
+        submitLabel: 'Save Changes',
         onSubmit: onSubmit,
       ),
     );

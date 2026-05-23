@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../state/habit_store.dart';
 import 'analytics_page.dart';
 import 'goals_page.dart';
 import 'habits_page.dart';
@@ -16,14 +17,24 @@ class MainScaffold extends StatefulWidget {
 }
 
 class _MainScaffoldState extends State<MainScaffold> {
+  // Single shared instance of the habit store, owned by the root scaffold.
+  // Passed into pages that need to read or mutate it.
+  final HabitStore _habitStore = HabitStore();
+
   int _currentIndex = 0;
 
-  static const _pages = <Widget>[
-    HabitsPage(),
-    JournalPage(),
-    GoalsPage(),
-    AnalyticsPage(),
+  late final List<Widget> _pages = [
+    HabitsPage(store: _habitStore),
+    const JournalPage(),
+    const GoalsPage(),
+    const AnalyticsPage(),
   ];
+
+  @override
+  void dispose() {
+    _habitStore.dispose();
+    super.dispose();
+  }
 
   static const _destinations = <NavigationDestination>[
     NavigationDestination(

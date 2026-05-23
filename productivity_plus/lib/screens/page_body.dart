@@ -23,9 +23,7 @@ class PageBody extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           children: [
-            const SizedBox(height: 32),
             const AppLogo(height: 180),
-            const SizedBox(height: 24),
             Text(
               title,
               style: theme.textTheme.headlineMedium?.copyWith(
