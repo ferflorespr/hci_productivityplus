@@ -23,4 +23,10 @@ class JournalStore extends ChangeNotifier {
     _entries[i] = entry;
     notifyListeners();
   }
+
+  void delete(String id) {
+    final removed = _entries.length;
+    _entries.removeWhere((e) => e.id == id);
+    if (_entries.length != removed) notifyListeners();
+  }
 }

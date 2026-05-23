@@ -73,6 +73,36 @@ class _JournalEntryViewState extends State<JournalEntryView> {
     );
   }
 
+  Future<void> _confirmDelete() async {
+    final theme = Theme.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: const Text(
+          "This will permanently delete this journal entry. This action can't be undone.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+    widget.store.delete(widget.entryId);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -93,6 +123,11 @@ class _JournalEntryViewState extends State<JournalEntryView> {
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: 'Edit title and date',
                 onPressed: () => _openMetaEdit(entry),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline),
+                tooltip: 'Delete entry',
+                onPressed: _confirmDelete,
               ),
             ],
           ),

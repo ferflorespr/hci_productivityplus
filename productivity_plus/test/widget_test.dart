@@ -80,4 +80,38 @@ void main() {
     expect(find.text('Quiet day'), findsOneWidget);
     expect(find.byTooltip('Edit title and date'), findsOneWidget);
   });
+
+  testWidgets('Deleting an entry from the viewer removes it after confirm', (tester) async {
+    await tester.pumpWidget(const ProductivityPlusApp());
+
+    await tester.tap(find.text('Journal').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add).hitTestable());
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Old thought');
+    await tester.pump();
+    await tester.tap(find.text('Save Entry'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(ListTile, 'Old thought'));
+    await tester.pumpAndSettle();
+
+    // Cancelling does NOT delete.
+    await tester.tap(find.byTooltip('Delete entry'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete entry?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete entry?'), findsNothing);
+    expect(find.byTooltip('Delete entry'), findsOneWidget); // still on viewer
+
+    // Confirming deletes.
+    await tester.tap(find.byTooltip('Delete entry'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Old thought'), findsNothing);
+    expect(find.text('No entries yet'), findsOneWidget);
+  });
 }
