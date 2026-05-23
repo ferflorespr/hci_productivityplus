@@ -44,6 +44,7 @@ class HabitsPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.large(
+        heroTag: 'add_habit_fab',
         onPressed: () => _openCreate(context),
         tooltip: 'Add habit',
         child: const Icon(Icons.add, size: 36),

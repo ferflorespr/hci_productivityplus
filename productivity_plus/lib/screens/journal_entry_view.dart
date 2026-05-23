@@ -1,0 +1,143 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+import '../models/journal_entry.dart';
+import '../state/journal_store.dart';
+import '../widgets/journal_form.dart' show formatDate;
+import 'edit_journal_page.dart';
+
+/// iOS Notes–style entry view. Title and date are shown read-only at the top,
+/// the body is an unbordered TextField that fills the rest of the screen and
+/// saves automatically as the user types (debounced 300ms, with a final flush
+/// on dispose so nothing is lost on a fast back-swipe).
+class JournalEntryView extends StatefulWidget {
+  const JournalEntryView({
+    super.key,
+    required this.entryId,
+    required this.store,
+  });
+
+  final String entryId;
+  final JournalStore store;
+
+  @override
+  State<JournalEntryView> createState() => _JournalEntryViewState();
+}
+
+class _JournalEntryViewState extends State<JournalEntryView> {
+  late final TextEditingController _controller;
+  Timer? _saveDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    final entry = _findEntry();
+    _controller = TextEditingController(text: entry?.content ?? '');
+    _controller.addListener(_handleChange);
+  }
+
+  @override
+  void dispose() {
+    _saveDebounce?.cancel();
+    _flushPending();
+    _controller.removeListener(_handleChange);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  JournalEntry? _findEntry() => widget.store.entries
+      .where((e) => e.id == widget.entryId)
+      .firstOrNull;
+
+  void _handleChange() {
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(const Duration(milliseconds: 300), _flushPending);
+  }
+
+  void _flushPending() {
+    final entry = _findEntry();
+    if (entry == null) return;
+    if (entry.content == _controller.text) return;
+    widget.store.update(entry.copyWith(content: _controller.text));
+  }
+
+  void _openMetaEdit(JournalEntry entry) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => EditJournalPage(
+          entry: entry,
+          onSubmit: widget.store.update,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.store,
+      builder: (context, _) {
+        final entry = _findEntry();
+        if (entry == null) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: Text('Entry not found.')),
+          );
+        }
+        final theme = Theme.of(context);
+        return Scaffold(
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                tooltip: 'Edit title and date',
+                onPressed: () => _openMetaEdit(entry),
+              ),
+            ],
+          ),
+          body: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.title,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    formatDate(entry.date),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      maxLines: null,
+                      expands: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      keyboardType: TextInputType.multiline,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Start writing…',
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

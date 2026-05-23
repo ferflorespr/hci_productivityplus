@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/habit.dart';
+import 'section_label.dart';
 
 /// The form fields for creating or editing a habit. Lives inside a Scaffold
 /// provided by the host page so the page controls the AppBar title and the
@@ -89,7 +90,7 @@ class _HabitFormState extends State<HabitForm> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
             children: [
-              _SectionLabel(text: 'Details'),
+              const SectionLabel('Details'),
               const SizedBox(height: 8),
               TextField(
                 controller: _titleController,
@@ -102,7 +103,7 @@ class _HabitFormState extends State<HabitForm> {
               ),
               const SizedBox(height: 24),
 
-              _SectionLabel(text: 'Schedule'),
+              const SectionLabel('Schedule'),
               const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,
@@ -162,7 +163,7 @@ class _HabitFormState extends State<HabitForm> {
               ),
               const SizedBox(height: 24),
 
-              _SectionLabel(text: 'Reminders'),
+              const SectionLabel('Reminders'),
               const SizedBox(height: 8),
               Card(
                 margin: EdgeInsets.zero,
@@ -196,24 +197,6 @@ class _HabitFormState extends State<HabitForm> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      text.toUpperCase(),
-      style: theme.textTheme.labelSmall?.copyWith(
-        color: theme.colorScheme.onSurfaceVariant,
-        letterSpacing: 1.2,
-        fontWeight: FontWeight.w600,
-      ),
     );
   }
 }
