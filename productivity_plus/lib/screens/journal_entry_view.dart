@@ -120,11 +120,6 @@ class _JournalEntryViewState extends State<JournalEntryView> {
           appBar: AppBar(
             actions: [
               IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Edit title and date',
-                onPressed: () => _openMetaEdit(entry),
-              ),
-              IconButton(
                 icon: const Icon(Icons.delete_outline),
                 tooltip: 'Delete entry',
                 onPressed: _confirmDelete,
@@ -138,17 +133,23 @@ class _JournalEntryViewState extends State<JournalEntryView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    entry.title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  _MetaEditPopup(
+                    onEdit: () => _openMetaEdit(entry),
+                    child: Text(
+                      entry.title,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    formatDate(entry.date),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                  _MetaEditPopup(
+                    onEdit: () => _openMetaEdit(entry),
+                    child: Text(
+                      formatDate(entry.date),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -173,6 +174,40 @@ class _JournalEntryViewState extends State<JournalEntryView> {
           ),
         );
       },
+    );
+  }
+}
+
+class _MetaEditPopup extends StatelessWidget {
+  const _MetaEditPopup({required this.onEdit, required this.child});
+
+  final VoidCallback onEdit;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      tooltip: '',
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 4),
+      padding: EdgeInsets.zero,
+      onSelected: (value) {
+        if (value == 'edit') onEdit();
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: 'edit',
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.edit_outlined, size: 20),
+              SizedBox(width: 8),
+              Text('Edit'),
+            ],
+          ),
+        ),
+      ],
+      child: child,
     );
   }
 }
