@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../state/goal_store.dart';
 import '../state/habit_store.dart';
 import '../state/journal_store.dart';
+// ignore: unused_import
+import '../state/seed_data.dart';
 import 'analytics_page.dart';
 import 'goals_page.dart';
 import 'habits_page.dart';
@@ -24,6 +26,13 @@ class _MainScaffoldState extends State<MainScaffold> {
   final GoalStore _goalStore = GoalStore();
 
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // ── Usability testing: uncomment the line below to start with sample data ──
+    seedStores(goalStore: _goalStore, habitStore: _habitStore, journalStore: _journalStore);
+  }
 
   late final List<Widget> _pages = [
     HabitsPage(store: _habitStore, goalStore: _goalStore),
