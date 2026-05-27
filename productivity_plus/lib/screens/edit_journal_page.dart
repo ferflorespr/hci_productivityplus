@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/journal_entry.dart';
+import '../state/goal_store.dart';
+import '../widgets/goal_link_dropdown.dart';
 import '../widgets/journal_form.dart' show formatDate;
 import '../widgets/section_label.dart';
 
@@ -11,10 +13,12 @@ class EditJournalPage extends StatefulWidget {
     super.key,
     required this.entry,
     required this.onSubmit,
+    this.goalStore,
   });
 
   final JournalEntry entry;
   final void Function(JournalEntry) onSubmit;
+  final GoalStore? goalStore;
 
   @override
   State<EditJournalPage> createState() => _EditJournalPageState();
@@ -23,12 +27,14 @@ class EditJournalPage extends StatefulWidget {
 class _EditJournalPageState extends State<EditJournalPage> {
   late final TextEditingController _titleController;
   late DateTime _date;
+  late String? _goalId;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.entry.title);
     _date = widget.entry.date;
+    _goalId = widget.entry.goalId;
     _titleController.addListener(() => setState(() {}));
   }
 
@@ -56,6 +62,7 @@ class _EditJournalPageState extends State<EditJournalPage> {
     widget.onSubmit(widget.entry.copyWith(
       title: _titleController.text.trim(),
       date: _date,
+      goalId: () => _goalId,
     ));
     Navigator.of(context).pop();
   }
@@ -95,6 +102,17 @@ class _EditJournalPageState extends State<EditJournalPage> {
                     onTap: _pickDate,
                   ),
                 ),
+                if (widget.goalStore != null &&
+                    widget.goalStore!.goals.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  const SectionLabel('Link to Goal'),
+                  const SizedBox(height: 8),
+                  GoalLinkDropdown(
+                    goalStore: widget.goalStore!,
+                    selectedGoalId: _goalId,
+                    onChanged: (id) => setState(() => _goalId = id),
+                  ),
+                ],
               ],
             ),
           ),

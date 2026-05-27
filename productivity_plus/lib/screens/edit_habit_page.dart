@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/habit.dart';
+import '../state/goal_store.dart';
 import '../widgets/habit_form.dart';
 
 class EditHabitPage extends StatelessWidget {
@@ -8,10 +9,12 @@ class EditHabitPage extends StatelessWidget {
     super.key,
     required this.habit,
     required this.onSubmit,
+    this.goalStore,
   });
 
   final Habit habit;
   final void Function(Habit) onSubmit;
+  final GoalStore? goalStore;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +24,7 @@ class EditHabitPage extends StatelessWidget {
         initial: habit,
         submitLabel: 'Save Changes',
         onSubmit: onSubmit,
+        goalStore: goalStore,
       ),
     );
   }

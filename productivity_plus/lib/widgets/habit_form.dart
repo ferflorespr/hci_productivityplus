@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/habit.dart';
+import '../state/goal_store.dart';
+import 'goal_link_dropdown.dart';
 import 'section_label.dart';
 
 /// The form fields for creating or editing a habit. Lives inside a Scaffold
@@ -10,17 +12,14 @@ class HabitForm extends StatefulWidget {
   const HabitForm({
     super.key,
     this.initial,
+    this.goalStore,
     required this.submitLabel,
     required this.onSubmit,
   });
 
-  /// Existing habit to edit, or null when creating a new one.
   final Habit? initial;
-
-  /// Label for the prominent bottom button (e.g. "Create Habit").
+  final GoalStore? goalStore;
   final String submitLabel;
-
-  /// Called with the final habit when the user taps the submit button.
   final void Function(Habit) onSubmit;
 
   @override
@@ -29,6 +28,7 @@ class HabitForm extends StatefulWidget {
 
 class _HabitFormState extends State<HabitForm> {
   late final TextEditingController _titleController;
+  late String? _goalId;
   late bool _scheduleEnabled;
   late HabitFrequency _frequency;
   late DateTime? _startDate;
@@ -39,6 +39,7 @@ class _HabitFormState extends State<HabitForm> {
     super.initState();
     final initial = widget.initial;
     _titleController = TextEditingController(text: initial?.title ?? '');
+    _goalId = initial?.goalId;
     _scheduleEnabled = initial?.scheduleEnabled ?? false;
     _frequency = initial?.frequency ?? HabitFrequency.daily;
     _startDate = initial?.startDate;
@@ -72,6 +73,7 @@ class _HabitFormState extends State<HabitForm> {
   void _handleSubmit() {
     final habit = (widget.initial ?? Habit(id: Habit.newId(), title: '')).copyWith(
       title: _titleController.text.trim(),
+      goalId: () => _goalId,
       scheduleEnabled: _scheduleEnabled,
       frequency: _frequency,
       startDate: _scheduleEnabled ? (_startDate ?? DateTime.now()) : null,
@@ -101,6 +103,17 @@ class _HabitFormState extends State<HabitForm> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              if (widget.goalStore != null &&
+                  widget.goalStore!.goals.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                const SectionLabel('Link to Goal'),
+                const SizedBox(height: 8),
+                GoalLinkDropdown(
+                  goalStore: widget.goalStore!,
+                  selectedGoalId: _goalId,
+                  onChanged: (id) => setState(() => _goalId = id),
+                ),
+              ],
               const SizedBox(height: 24),
 
               const SectionLabel('Schedule'),

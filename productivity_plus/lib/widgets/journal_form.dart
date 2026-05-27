@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../models/journal_entry.dart';
+import '../state/goal_store.dart';
+import 'goal_link_dropdown.dart';
 import 'section_label.dart';
 
 class JournalForm extends StatefulWidget {
   const JournalForm({
     super.key,
     this.initial,
+    this.goalStore,
     required this.submitLabel,
     required this.onSubmit,
   });
 
   final JournalEntry? initial;
+  final GoalStore? goalStore;
   final String submitLabel;
   final void Function(JournalEntry) onSubmit;
 
@@ -23,6 +27,7 @@ class _JournalFormState extends State<JournalForm> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   late DateTime _date;
+  late String? _goalId;
 
   @override
   void initState() {
@@ -31,6 +36,7 @@ class _JournalFormState extends State<JournalForm> {
     _titleController = TextEditingController(text: initial?.title ?? '');
     _contentController = TextEditingController(text: initial?.content ?? '');
     _date = initial?.date ?? DateTime.now();
+    _goalId = initial?.goalId;
     _titleController.addListener(() => setState(() {}));
   }
 
@@ -67,6 +73,7 @@ class _JournalFormState extends State<JournalForm> {
       title: _titleController.text.trim(),
       date: _date,
       content: _contentController.text,
+      goalId: () => _goalId,
     );
     widget.onSubmit(entry);
     Navigator.of(context).pop();
@@ -106,6 +113,17 @@ class _JournalFormState extends State<JournalForm> {
                   onTap: _pickDate,
                 ),
               ),
+              if (widget.goalStore != null &&
+                  widget.goalStore!.goals.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                const SectionLabel('Link to Goal'),
+                const SizedBox(height: 8),
+                GoalLinkDropdown(
+                  goalStore: widget.goalStore!,
+                  selectedGoalId: _goalId,
+                  onChanged: (id) => setState(() => _goalId = id),
+                ),
+              ],
               const SizedBox(height: 20),
               const SectionLabel('Entry'),
               const SizedBox(height: 8),

@@ -18,6 +18,7 @@ class Habit {
   const Habit({
     required this.id,
     required this.title,
+    this.goalId,
     this.scheduleEnabled = false,
     this.frequency = HabitFrequency.daily,
     this.startDate,
@@ -26,6 +27,7 @@ class Habit {
 
   final String id;
   final String title;
+  final String? goalId;
   final bool scheduleEnabled;
   final HabitFrequency frequency;
   final DateTime? startDate;
@@ -36,6 +38,7 @@ class Habit {
 
   Habit copyWith({
     String? title,
+    String? Function()? goalId,
     bool? scheduleEnabled,
     HabitFrequency? frequency,
     DateTime? startDate,
@@ -44,6 +47,7 @@ class Habit {
     return Habit(
       id: id,
       title: title ?? this.title,
+      goalId: goalId != null ? goalId() : this.goalId,
       scheduleEnabled: scheduleEnabled ?? this.scheduleEnabled,
       frequency: frequency ?? this.frequency,
       startDate: startDate ?? this.startDate,

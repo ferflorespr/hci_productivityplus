@@ -26,8 +26,8 @@ class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
   late final List<Widget> _pages = [
-    HabitsPage(store: _habitStore),
-    JournalPage(store: _journalStore),
+    HabitsPage(store: _habitStore, goalStore: _goalStore),
+    JournalPage(store: _journalStore, goalStore: _goalStore),
     GoalsPage(store: _goalStore),
     const AnalyticsPage(),
   ];

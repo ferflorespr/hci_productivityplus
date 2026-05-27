@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/journal_entry.dart';
+import '../state/goal_store.dart';
 import '../state/journal_store.dart';
 import '../widgets/journal_form.dart' show formatDate;
 import 'edit_journal_page.dart';
@@ -16,10 +17,12 @@ class JournalEntryView extends StatefulWidget {
     super.key,
     required this.entryId,
     required this.store,
+    this.goalStore,
   });
 
   final String entryId;
   final JournalStore store;
+  final GoalStore? goalStore;
 
   @override
   State<JournalEntryView> createState() => _JournalEntryViewState();
@@ -68,6 +71,7 @@ class _JournalEntryViewState extends State<JournalEntryView> {
         builder: (_) => EditJournalPage(
           entry: entry,
           onSubmit: widget.store.update,
+          goalStore: widget.goalStore,
         ),
       ),
     );
@@ -152,6 +156,56 @@ class _JournalEntryViewState extends State<JournalEntryView> {
                       ),
                     ),
                   ),
+                  if (widget.goalStore != null && entry.goalId != null) ...[
+                    Builder(builder: (context) {
+                      final goal = widget.goalStore!.goals
+                          .where((g) => g.id == entry.goalId)
+                          .firstOrNull;
+                      if (goal == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: goal.category.color.withAlpha(38),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: goal.category.color.withAlpha(100),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: goal.category.color,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    goal.title,
+                                    style:
+                                        theme.textTheme.labelMedium?.copyWith(
+                                      color: goal.category.color,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
                   const SizedBox(height: 16),
                   Expanded(
                     child: TextField(

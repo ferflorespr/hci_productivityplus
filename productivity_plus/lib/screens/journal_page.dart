@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../models/goal.dart';
 import '../models/journal_entry.dart';
+import '../state/goal_store.dart';
 import '../state/journal_store.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/journal_form.dart' show formatDate;
@@ -8,9 +10,10 @@ import 'create_journal_page.dart';
 import 'journal_entry_view.dart';
 
 class JournalPage extends StatelessWidget {
-  const JournalPage({super.key, required this.store});
+  const JournalPage({super.key, required this.store, this.goalStore});
 
   final JournalStore store;
+  final GoalStore? goalStore;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +39,7 @@ class JournalPage extends StatelessWidget {
                       ? const _EmptyState()
                       : _EntryList(
                           entries: entries,
+                          goalStore: goalStore,
                           onTapEntry: (e) => _openView(context, e),
                         ),
                 ),
@@ -56,7 +60,10 @@ class JournalPage extends StatelessWidget {
   void _openCreate(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => CreateJournalPage(onSubmit: store.add),
+        builder: (_) => CreateJournalPage(
+          onSubmit: store.add,
+          goalStore: goalStore,
+        ),
         fullscreenDialog: true,
       ),
     );
@@ -65,7 +72,11 @@ class JournalPage extends StatelessWidget {
   void _openView(BuildContext context, JournalEntry entry) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => JournalEntryView(entryId: entry.id, store: store),
+        builder: (_) => JournalEntryView(
+          entryId: entry.id,
+          store: store,
+          goalStore: goalStore,
+        ),
       ),
     );
   }
@@ -105,40 +116,67 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _EntryList extends StatelessWidget {
-  const _EntryList({required this.entries, required this.onTapEntry});
+  const _EntryList({
+    required this.entries,
+    required this.onTapEntry,
+    this.goalStore,
+  });
 
   final List<JournalEntry> entries;
   final void Function(JournalEntry) onTapEntry;
+  final GoalStore? goalStore;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
       itemCount: entries.length,
-      itemBuilder: (context, i) => _EntryTile(
-        entry: entries[i],
-        onTap: () => onTapEntry(entries[i]),
-      ),
+      itemBuilder: (context, i) {
+        final entry = entries[i];
+        final linkedGoal = (entry.goalId != null && goalStore != null)
+            ? goalStore!.goals
+                .where((g) => g.id == entry.goalId)
+                .firstOrNull
+            : null;
+        return _EntryTile(
+          entry: entry,
+          linkedGoal: linkedGoal,
+          onTap: () => onTapEntry(entry),
+        );
+      },
     );
   }
 }
 
 class _EntryTile extends StatelessWidget {
-  const _EntryTile({required this.entry, required this.onTap});
+  const _EntryTile({
+    required this.entry,
+    required this.onTap,
+    this.linkedGoal,
+  });
 
   final JournalEntry entry;
   final VoidCallback onTap;
+  final Goal? linkedGoal;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final avatarBg = linkedGoal != null
+        ? linkedGoal!.category.color.withAlpha(51)
+        : theme.colorScheme.primaryContainer;
+    final avatarFg = linkedGoal != null
+        ? linkedGoal!.category.color
+        : theme.colorScheme.onPrimaryContainer;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primaryContainer,
-          foregroundColor: theme.colorScheme.onPrimaryContainer,
+          backgroundColor: avatarBg,
+          foregroundColor: avatarFg,
           child: Text(
             '${entry.date.day}',
             style: const TextStyle(fontWeight: FontWeight.w600),
@@ -154,6 +192,33 @@ class _EntryTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(formatDate(entry.date)),
+            if (linkedGoal != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: linkedGoal!.category.color,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        linkedGoal!.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: linkedGoal!.category.color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (entry.content.trim().isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(
@@ -171,7 +236,7 @@ class _EntryTile extends StatelessWidget {
           Icons.chevron_right,
           color: theme.colorScheme.onSurfaceVariant,
         ),
-        isThreeLine: entry.content.trim().isNotEmpty,
+        isThreeLine: true,
       ),
     );
   }
