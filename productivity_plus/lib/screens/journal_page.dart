@@ -163,12 +163,15 @@ class _EntryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final avatarBg = linkedGoal != null
-        ? linkedGoal!.category.color.withAlpha(51)
-        : theme.colorScheme.primaryContainer;
-    final avatarFg = linkedGoal != null
-        ? linkedGoal!.category.color
-        : theme.colorScheme.onPrimaryContainer;
+    final Color avatarBg;
+    final Widget avatarChild;
+    if (linkedGoal != null) {
+      avatarBg = linkedGoal!.category.color.withAlpha(51);
+      avatarChild = Icon(linkedGoal!.category.icon, color: linkedGoal!.category.color);
+    } else {
+      avatarBg = Colors.grey.shade200;
+      avatarChild = Icon(Icons.star_rounded, color: Colors.grey.shade400);
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -176,11 +179,7 @@ class _EntryTile extends StatelessWidget {
         onTap: onTap,
         leading: CircleAvatar(
           backgroundColor: avatarBg,
-          foregroundColor: avatarFg,
-          child: Text(
-            '${entry.date.day}',
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+          child: avatarChild,
         ),
         title: Text(
           entry.title,

@@ -36,14 +36,7 @@ class GoalLinkDropdown extends StatelessWidget {
             value: g.id,
             child: Row(
               children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: g.category.color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+                Icon(g.category.icon, size: 18, color: g.category.color),
                 const SizedBox(width: 10),
                 Flexible(
                   child: Text(

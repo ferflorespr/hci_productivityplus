@@ -161,16 +161,16 @@ class _HabitTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final initial = habit.title.isNotEmpty
-        ? habit.title.characters.first.toUpperCase()
-        : '?';
 
-    final avatarBg = linkedGoal != null
-        ? linkedGoal!.category.color.withAlpha(51)
-        : theme.colorScheme.primaryContainer;
-    final avatarFg = linkedGoal != null
-        ? linkedGoal!.category.color
-        : theme.colorScheme.onPrimaryContainer;
+    final Color avatarBg;
+    final Widget avatarChild;
+    if (linkedGoal != null) {
+      avatarBg = linkedGoal!.category.color.withAlpha(51);
+      avatarChild = Icon(linkedGoal!.category.icon, color: linkedGoal!.category.color);
+    } else {
+      avatarBg = Colors.grey.shade200;
+      avatarChild = Icon(Icons.star_rounded, color: Colors.grey.shade400);
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -178,8 +178,7 @@ class _HabitTile extends StatelessWidget {
         onTap: onTap,
         leading: CircleAvatar(
           backgroundColor: avatarBg,
-          foregroundColor: avatarFg,
-          child: Text(initial, style: const TextStyle(fontWeight: FontWeight.w600)),
+          child: avatarChild,
         ),
         title: Text(
           habit.title,

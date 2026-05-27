@@ -125,15 +125,8 @@ class _GoalFormState extends State<GoalForm> {
                         value: c,
                         child: Row(
                           children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: c.color,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
+                            Icon(c.icon, size: 20, color: c.color),
+                            const SizedBox(width: 10),
                             Flexible(child: Text(c.label)),
                           ],
                         ),

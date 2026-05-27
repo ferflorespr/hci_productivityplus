@@ -1,37 +1,42 @@
-import 'dart:ui';
-
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 enum GoalCategory {
   healthAndWellness(
     'Health & Physical Wellness',
     Color(0xFF4CAF50),
+    Icons.favorite_rounded,
   ),
   financialAndWealth(
     'Financial & Wealth',
     Color(0xFFFFA726),
+    Icons.savings_rounded,
   ),
   careerAndAcademic(
     'Career & Academic',
     Color(0xFF42A5F5),
+    Icons.school_rounded,
   ),
   socialAndRelationships(
     'Social & Relationships',
     Color(0xFFEC407A),
+    Icons.people_rounded,
   ),
   hobbiesAndCreativity(
     'Hobbies & Creativity',
     Color(0xFFAB47BC),
+    Icons.palette_rounded,
   ),
   intellectualAndGrowth(
     'Intellectual & Personal Growth',
     Color(0xFF26A69A),
+    Icons.psychology_rounded,
   );
 
-  const GoalCategory(this.label, this.color);
+  const GoalCategory(this.label, this.color, this.icon);
 
   final String label;
   final Color color;
+  final IconData icon;
 }
 
 @immutable

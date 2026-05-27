@@ -112,15 +112,12 @@ class GoalView extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: goal.category.color,
-                              shape: BoxShape.circle,
-                            ),
+                          Icon(
+                            goal.category.icon,
+                            size: 16,
+                            color: goal.category.color,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           Text(
                             goal.category.label,
                             style: theme.textTheme.labelLarge?.copyWith(

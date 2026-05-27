@@ -293,6 +293,12 @@ class _PositionedBubble extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Icon(
+                  bubble.category.icon,
+                  color: bubble.category.color,
+                  size: (bubble.radius * 0.4).clamp(16.0, 32.0),
+                ),
+                const SizedBox(height: 2),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
@@ -303,17 +309,17 @@ class _PositionedBubble extends StatelessWidget {
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: bubble.category.color,
                       fontWeight: FontWeight.w700,
-                      fontSize: (bubble.radius * 0.18).clamp(9.0, 13.0),
+                      fontSize: (bubble.radius * 0.17).clamp(8.0, 12.0),
                     ),
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 1),
                 Text(
                   '${bubble.count}',
                   style: TextStyle(
                     color: bubble.category.color,
                     fontWeight: FontWeight.w800,
-                    fontSize: (bubble.radius * 0.35).clamp(14.0, 28.0),
+                    fontSize: (bubble.radius * 0.28).clamp(12.0, 24.0),
                   ),
                 ),
               ],

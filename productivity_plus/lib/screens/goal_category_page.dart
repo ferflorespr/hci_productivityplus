@@ -22,14 +22,7 @@ class GoalCategoryPage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: category.color,
-                shape: BoxShape.circle,
-              ),
-            ),
+            Icon(category.icon, color: category.color, size: 22),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
