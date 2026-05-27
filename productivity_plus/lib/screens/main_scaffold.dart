@@ -25,7 +25,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   final JournalStore _journalStore = JournalStore();
   final GoalStore _goalStore = GoalStore();
 
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
   @override
   void initState() {
