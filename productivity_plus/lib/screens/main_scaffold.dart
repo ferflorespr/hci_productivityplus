@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../state/goal_store.dart';
 import '../state/habit_store.dart';
 import '../state/journal_store.dart';
 import 'analytics_page.dart';
@@ -20,13 +21,14 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   final HabitStore _habitStore = HabitStore();
   final JournalStore _journalStore = JournalStore();
+  final GoalStore _goalStore = GoalStore();
 
   int _currentIndex = 0;
 
   late final List<Widget> _pages = [
     HabitsPage(store: _habitStore),
     JournalPage(store: _journalStore),
-    const GoalsPage(),
+    GoalsPage(store: _goalStore),
     const AnalyticsPage(),
   ];
 
@@ -34,6 +36,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   void dispose() {
     _habitStore.dispose();
     _journalStore.dispose();
+    _goalStore.dispose();
     super.dispose();
   }
 
