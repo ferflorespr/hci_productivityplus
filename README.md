@@ -89,7 +89,7 @@ explore browsing, editing, and linking features. The seed data includes:
 - **5 habits** each linked to a goal
 - **5 journal entries** each linked to a goal
 
-In `main_scaffold.dart`, **uncomment** the seed line inside `initState`:
+In `main_scaffold.dart`, **uncomment** the seed line 34 inside `initState`:
 
 ```dart
 @override
