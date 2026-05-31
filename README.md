@@ -60,6 +60,52 @@ This repository currently contains documentation for the Productivity+ project. 
 - `/presentation` for slides and supporting materials
 
 
+## Usability Testing
+
+The app supports two testing configurations controlled by a single line in
+`productivity_plus/lib/screens/main_scaffold.dart`.
+
+### Test 1 — Empty Start (no pre-existing data)
+
+The app launches with no goals, habits, or journal entries. This tests the
+first-time user experience and creation flows.
+
+In `main_scaffold.dart`, **comment out** the seed line 34 inside `initState`:
+
+```dart
+@override
+void initState() {
+  super.initState();
+  // seedStores(goalStore: _goalStore, habitStore: _habitStore, journalStore: _journalStore);
+}
+```
+
+### Test 2 — Pre-populated Data
+
+The app launches with sample data already loaded so testers can immediately
+explore browsing, editing, and linking features. The seed data includes:
+
+- **5 goals** across 3 categories (Health & Physical Wellness, Career & Academic, Hobbies & Creativity)
+- **5 habits** each linked to a goal
+- **5 journal entries** each linked to a goal
+
+In `main_scaffold.dart`, **uncomment** the seed line 34 inside `initState`:
+
+```dart
+@override
+void initState() {
+  super.initState();
+  seedStores(goalStore: _goalStore, habitStore: _habitStore, journalStore: _journalStore);
+}
+```
+
+### Running the app
+
+```bash
+cd productivity_plus
+flutter run
+```
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for details.
