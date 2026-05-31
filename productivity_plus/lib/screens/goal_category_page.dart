@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/goal.dart';
 import '../state/goal_store.dart';
+import '../state/habit_store.dart';
+import '../state/journal_store.dart';
 import 'goal_view.dart';
 
 class GoalCategoryPage extends StatelessWidget {
@@ -9,10 +11,14 @@ class GoalCategoryPage extends StatelessWidget {
     super.key,
     required this.category,
     required this.store,
+    this.habitStore,
+    this.journalStore,
   });
 
   final GoalCategory category;
   final GoalStore store;
+  final HabitStore? habitStore;
+  final JournalStore? journalStore;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +99,12 @@ class GoalCategoryPage extends StatelessWidget {
   void _openGoal(BuildContext context, Goal goal) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => GoalView(goalId: goal.id, store: store),
+        builder: (_) => GoalView(
+          goalId: goal.id,
+          store: store,
+          habitStore: habitStore,
+          journalStore: journalStore,
+        ),
       ),
     );
   }

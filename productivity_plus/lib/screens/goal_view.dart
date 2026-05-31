@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../models/goal.dart';
 import '../state/goal_store.dart';
+import '../state/habit_store.dart';
+import '../state/journal_store.dart';
+import '../widgets/journal_form.dart' show formatDate;
 import 'edit_goal_page.dart';
 
 class GoalView extends StatelessWidget {
@@ -9,10 +12,14 @@ class GoalView extends StatelessWidget {
     super.key,
     required this.goalId,
     required this.store,
+    this.habitStore,
+    this.journalStore,
   });
 
   final String goalId;
   final GoalStore store;
+  final HabitStore? habitStore;
+  final JournalStore? journalStore;
 
   Goal? _find() =>
       store.goals.where((g) => g.id == goalId).firstOrNull;
@@ -155,6 +162,44 @@ class GoalView extends StatelessWidget {
                     goal.description,
                     style: theme.textTheme.bodyLarge,
                   ),
+                ],
+                if (habitStore != null) ...[
+                  const SizedBox(height: 28),
+                  Text('Habits', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  ...() {
+                    final linked = habitStore!.habits.where((h) => h.goalId == goalId).toList();
+                    if (linked.isEmpty) {
+                      return [Text('No habits linked to this goal.', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant))];
+                    }
+                    return linked.map((h) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: const Icon(Icons.repeat_rounded),
+                        title: Text(h.title),
+                        subtitle: Text(h.scheduleEnabled ? h.frequency.label : 'No schedule'),
+                      ),
+                    )).toList();
+                  }(),
+                ],
+                if (journalStore != null) ...[
+                  const SizedBox(height: 28),
+                  Text('Journal Entries', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  ...() {
+                    final linked = journalStore!.entries.where((e) => e.goalId == goalId).toList();
+                    if (linked.isEmpty) {
+                      return [Text('No journal entries linked to this goal.', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant))];
+                    }
+                    return linked.map((e) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: const Icon(Icons.menu_book_rounded),
+                        title: Text(e.title),
+                        subtitle: Text(formatDate(e.date)),
+                      ),
+                    )).toList();
+                  }(),
                 ],
               ],
             ),

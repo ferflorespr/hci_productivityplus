@@ -4,14 +4,18 @@ import 'package:flutter/material.dart';
 
 import '../models/goal.dart';
 import '../state/goal_store.dart';
+import '../state/habit_store.dart';
+import '../state/journal_store.dart';
 import '../widgets/app_logo.dart';
 import 'create_goal_page.dart';
 import 'goal_category_page.dart';
 
 class GoalsPage extends StatelessWidget {
-  const GoalsPage({super.key, required this.store});
+  const GoalsPage({super.key, required this.store, this.habitStore, this.journalStore});
 
   final GoalStore store;
+  final HabitStore? habitStore;
+  final JournalStore? journalStore;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,7 @@ class GoalsPage extends StatelessWidget {
                 builder: (context, _) {
                   final goals = store.goals;
                   if (goals.isEmpty) return const _EmptyState();
-                  return _BubbleField(store: store, goals: goals);
+                  return _BubbleField(store: store, goals: goals, habitStore: habitStore, journalStore: journalStore);
                 },
               ),
             ),
@@ -59,6 +63,8 @@ class GoalsPage extends StatelessWidget {
     );
   }
 }
+
+
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
@@ -108,10 +114,12 @@ class _CategoryBubble {
 }
 
 class _BubbleField extends StatefulWidget {
-  const _BubbleField({required this.store, required this.goals});
+  const _BubbleField({required this.store, required this.goals, this.habitStore, this.journalStore});
 
   final GoalStore store;
   final List<Goal> goals;
+  final HabitStore? habitStore;
+  final JournalStore? journalStore;
 
   @override
   State<_BubbleField> createState() => _BubbleFieldState();
@@ -187,6 +195,8 @@ class _BubbleFieldState extends State<_BubbleField> {
         builder: (_) => GoalCategoryPage(
           category: category,
           store: widget.store,
+          habitStore: widget.habitStore,
+          journalStore: widget.journalStore,
         ),
       ),
     );
