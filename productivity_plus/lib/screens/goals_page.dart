@@ -131,9 +131,19 @@ class _BubbleFieldState extends State<_BubbleField> {
   bool _positioned = false;
 
   Map<GoalCategory, int> _countByCategory(List<Goal> goals) {
+    // Initialize every category that has at least one goal with 1
     final map = <GoalCategory, int>{};
     for (final g in goals) {
-      map[g.category] = (map[g.category] ?? 0) + 1;
+      map[g.category] = 1;
+    }
+    // Grow the count by the number of habits linked to goals in each category
+    if (widget.habitStore != null) {
+      for (final h in widget.habitStore!.habits) {
+        if (h.goalId == null) continue;
+        final goal = goals.where((g) => g.id == h.goalId).firstOrNull;
+        if (goal == null) continue;
+        map[goal.category] = (map[goal.category] ?? 1) + 1;
+      }
     }
     return map;
   }
