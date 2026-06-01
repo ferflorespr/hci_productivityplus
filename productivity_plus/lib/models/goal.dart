@@ -48,6 +48,10 @@ class Goal {
     this.category = GoalCategory.healthAndWellness,
     this.targetDate,
     this.completed = false,
+    this.streakDays = 0,
+    this.momentumOnHold = false,
+    this.lapseDate,
+    this.recoveryThresholdPct = 0.5,
   });
 
   final String id;
@@ -56,6 +60,14 @@ class Goal {
   final GoalCategory category;
   final DateTime? targetDate;
   final bool completed;
+  /// Consecutive days this goal's linked habits were all completed.
+  final int streakDays;
+  /// True when a lapse was detected; streak is preserved until recovery succeeds or fails.
+  final bool momentumOnHold;
+  /// The date the lapse occurred.
+  final DateTime? lapseDate;
+  /// Fraction of linked habits that must be completed the day after a lapse to recover (default 0.5 = 50%).
+  final double recoveryThresholdPct;
 
   static String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
@@ -65,6 +77,10 @@ class Goal {
     GoalCategory? category,
     DateTime? targetDate,
     bool? completed,
+    int? streakDays,
+    bool? momentumOnHold,
+    DateTime? Function()? lapseDate,
+    double? recoveryThresholdPct,
   }) {
     return Goal(
       id: id,
@@ -73,6 +89,10 @@ class Goal {
       category: category ?? this.category,
       targetDate: targetDate ?? this.targetDate,
       completed: completed ?? this.completed,
+      streakDays: streakDays ?? this.streakDays,
+      momentumOnHold: momentumOnHold ?? this.momentumOnHold,
+      lapseDate: lapseDate != null ? lapseDate() : this.lapseDate,
+      recoveryThresholdPct: recoveryThresholdPct ?? this.recoveryThresholdPct,
     );
   }
 }

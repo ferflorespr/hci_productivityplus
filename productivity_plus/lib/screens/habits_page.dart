@@ -38,6 +38,7 @@ class HabitsPage extends StatelessWidget {
                       ? const _EmptyState()
                       : _HabitList(
                           habits: habits,
+                          habitStore: store,
                           goalStore: goalStore,
                           onTapHabit: (h) => _openEdit(context, h),
                         ),
@@ -118,15 +119,18 @@ class _HabitList extends StatelessWidget {
   const _HabitList({
     required this.habits,
     required this.onTapHabit,
+    required this.habitStore,
     this.goalStore,
   });
 
   final List<Habit> habits;
   final void Function(Habit) onTapHabit;
+  final HabitStore habitStore;
   final GoalStore? goalStore;
 
   @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
       itemCount: habits.length,
@@ -140,7 +144,9 @@ class _HabitList extends StatelessWidget {
         return _HabitTile(
           habit: habit,
           linkedGoal: linkedGoal,
+          isCompletedToday: habitStore.isCompletedOn(habit.id, today),
           onTap: () => onTapHabit(habit),
+          onToggleToday: () => habitStore.toggleCompletionOn(habit.id, today),
         );
       },
     );
@@ -151,11 +157,15 @@ class _HabitTile extends StatelessWidget {
   const _HabitTile({
     required this.habit,
     required this.onTap,
+    required this.isCompletedToday,
+    required this.onToggleToday,
     this.linkedGoal,
   });
 
   final Habit habit;
   final VoidCallback onTap;
+  final bool isCompletedToday;
+  final VoidCallback onToggleToday;
   final Goal? linkedGoal;
 
   @override
@@ -229,7 +239,23 @@ class _HabitTile extends StatelessWidget {
                 size: 20,
                 color: theme.colorScheme.primary,
               ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
+            GestureDetector(
+              onTap: onToggleToday,
+              child: Tooltip(
+                message: isCompletedToday ? 'Mark incomplete' : 'Mark done today',
+                child: Icon(
+                  isCompletedToday
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  size: 28,
+                  color: isCompletedToday
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outlineVariant,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
             Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
           ],
         ),

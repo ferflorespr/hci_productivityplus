@@ -23,4 +23,33 @@ class HabitStore extends ChangeNotifier {
     _habits[index] = habit;
     notifyListeners();
   }
+
+  void toggleCompletionOn(String habitId, DateTime date) {
+    final index = _habits.indexWhere((h) => h.id == habitId);
+    if (index == -1) return;
+    final key = Habit.dateKey(date);
+    final habit = _habits[index];
+    final newDates = List<String>.from(habit.completedDates);
+    if (newDates.contains(key)) {
+      newDates.remove(key);
+    } else {
+      newDates.add(key);
+    }
+    _habits[index] = habit.copyWith(completedDates: newDates);
+    notifyListeners();
+  }
+
+  bool isCompletedOn(String habitId, DateTime date) {
+    final key = Habit.dateKey(date);
+    final habit = _habits.where((h) => h.id == habitId).firstOrNull;
+    return habit?.completedDates.contains(key) ?? false;
+  }
+
+  /// How many habits from [habitIds] were completed on [date].
+  int countCompletedOn(Iterable<String> habitIds, DateTime date) {
+    final key = Habit.dateKey(date);
+    return _habits
+        .where((h) => habitIds.contains(h.id) && h.completedDates.contains(key))
+        .length;
+  }
 }

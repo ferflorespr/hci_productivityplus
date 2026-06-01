@@ -23,6 +23,7 @@ class Habit {
     this.frequency = HabitFrequency.daily,
     this.startDate,
     this.remindersEnabled = false,
+    this.completedDates = const [],
   });
 
   final String id;
@@ -32,9 +33,16 @@ class Habit {
   final HabitFrequency frequency;
   final DateTime? startDate;
   final bool remindersEnabled;
+  /// ISO date strings ("YYYY-MM-DD") for days when this habit was completed.
+  final List<String> completedDates;
 
   /// Generates a unique-enough id for in-memory use.
   static String newId() => DateTime.now().microsecondsSinceEpoch.toString();
+
+  static String dateKey(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  bool isCompletedOn(DateTime date) => completedDates.contains(dateKey(date));
 
   Habit copyWith({
     String? title,
@@ -43,6 +51,7 @@ class Habit {
     HabitFrequency? frequency,
     DateTime? startDate,
     bool? remindersEnabled,
+    List<String>? completedDates,
   }) {
     return Habit(
       id: id,
@@ -52,6 +61,7 @@ class Habit {
       frequency: frequency ?? this.frequency,
       startDate: startDate ?? this.startDate,
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
+      completedDates: completedDates ?? this.completedDates,
     );
   }
 }

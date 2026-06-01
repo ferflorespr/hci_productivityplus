@@ -46,6 +46,7 @@ void seedStores({
     description: 'Study for and pass the AWS Solutions Architect exam.',
     category: GoalCategory.careerAndAcademic,
     targetDate: null,
+    streakDays: 5,
   );
 
   const goalLearnGuitar = Goal(
@@ -56,14 +57,29 @@ void seedStores({
     targetDate: null,
   );
 
-  for (final g in [goalRunMarathon, goalEatHealthier, goalPromotion, goalCertification, goalLearnGuitar]) {
+  // Daniela's goal — 14-day streak currently on hold after a Tuesday lapse
+  final goalNoPhoneMorning = Goal(
+    id: 'goal_6',
+    title: 'No-Phone Morning',
+    description:
+        'Start each morning without phone distraction. Build a focused morning routine through journaling, sketching, and other mindful habits.',
+    category: GoalCategory.intellectualAndGrowth,
+    streakDays: 14,
+    momentumOnHold: true,
+    lapseDate: DateTime.now().subtract(const Duration(days: 1)),
+    recoveryThresholdPct: 0.5,
+  );
+
+  for (final g in [goalRunMarathon, goalEatHealthier, goalPromotion, goalCertification, goalLearnGuitar, goalNoPhoneMorning]) {
     goalStore.add(g);
   }
 
   // ── Habits (5 habits, linked to goals) ─────────────────────────────────
 
-  const habits = [
-    Habit(
+  final todayKey = '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}';
+
+  final habits = [
+    const Habit(
       id: 'habit_1',
       title: 'Morning 5K run',
       goalId: 'goal_1',
@@ -71,21 +87,21 @@ void seedStores({
       frequency: HabitFrequency.daily,
       remindersEnabled: true,
     ),
-    Habit(
+    const Habit(
       id: 'habit_2',
       title: 'Meal prep on Sundays',
       goalId: 'goal_2',
       scheduleEnabled: true,
       frequency: HabitFrequency.weekly,
     ),
-    Habit(
+    const Habit(
       id: 'habit_3',
       title: 'Read leadership articles',
       goalId: 'goal_3',
       scheduleEnabled: true,
       frequency: HabitFrequency.daily,
     ),
-    Habit(
+    const Habit(
       id: 'habit_4',
       title: 'AWS practice questions',
       goalId: 'goal_4',
@@ -93,10 +109,55 @@ void seedStores({
       frequency: HabitFrequency.daily,
       remindersEnabled: true,
     ),
-    Habit(
+    const Habit(
       id: 'habit_5',
       title: 'Guitar practice 30 min',
       goalId: 'goal_5',
+      scheduleEnabled: true,
+      frequency: HabitFrequency.daily,
+    ),
+    // Daniela's morning habits — 6 total, recovery requires completing 3
+    Habit(
+      id: 'habit_6',
+      title: 'Morning journaling',
+      goalId: 'goal_6',
+      scheduleEnabled: true,
+      frequency: HabitFrequency.daily,
+      completedDates: [todayKey],
+    ),
+    Habit(
+      id: 'habit_7',
+      title: 'Sketching practice',
+      goalId: 'goal_6',
+      scheduleEnabled: true,
+      frequency: HabitFrequency.daily,
+      completedDates: [todayKey],
+    ),
+    const Habit(
+      id: 'habit_8',
+      title: 'Morning meditation',
+      goalId: 'goal_6',
+      scheduleEnabled: true,
+      frequency: HabitFrequency.daily,
+    ),
+    const Habit(
+      id: 'habit_9',
+      title: 'Light stretching',
+      goalId: 'goal_6',
+      scheduleEnabled: true,
+      frequency: HabitFrequency.daily,
+    ),
+    const Habit(
+      id: 'habit_10',
+      title: 'Read 10 pages',
+      goalId: 'goal_6',
+      scheduleEnabled: true,
+      frequency: HabitFrequency.daily,
+    ),
+    const Habit(
+      id: 'habit_11',
+      title: 'Healthy breakfast',
+      goalId: 'goal_6',
       scheduleEnabled: true,
       frequency: HabitFrequency.daily,
     ),
