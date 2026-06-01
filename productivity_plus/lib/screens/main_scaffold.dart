@@ -38,7 +38,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     HabitsPage(store: _habitStore, goalStore: _goalStore),
     JournalPage(store: _journalStore, goalStore: _goalStore),
     GoalsPage(store: _goalStore, habitStore: _habitStore, journalStore: _journalStore),
-    const AnalyticsPage(),
+    AnalyticsPage(goalStore: _goalStore, habitStore: _habitStore, journalStore: _journalStore),
   ];
 
   @override
