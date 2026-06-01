@@ -21,6 +21,7 @@ class AnalyticsPage extends StatefulWidget {
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
   late DateTime _calendarMonth = DateTime(DateTime.now().year, DateTime.now().month);
+  DateTime? _selectedDay;
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +115,25 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               theme: theme,
               month: _calendarMonth,
               daysWithEntries: daysWithEntries,
+              selectedDay: _selectedDay,
               onPrev: () => setState(() => _calendarMonth = DateTime(_calendarMonth.year, _calendarMonth.month - 1)),
               onNext: () => setState(() => _calendarMonth = DateTime(_calendarMonth.year, _calendarMonth.month + 1)),
+              onYearPick: () => _pickYear(context),
+              onDayTap: (date) => setState(() => _selectedDay = _selectedDay == date ? null : date),
             ),
+            if (_selectedDay != null) ...[
+              const SizedBox(height: 20),
+              _SelectedDayEntries(
+                theme: theme,
+                day: _selectedDay!,
+                entries: entries.where((e) {
+                  final d = DateTime(e.date.year, e.date.month, e.date.day);
+                  return d == _selectedDay;
+                }).toList(),
+                goalStore: widget.goalStore,
+                cs: cs,
+              ),
+            ],
 
             // ── Recent entries ───────────────────────────────────────────────
             if (entries.isNotEmpty) ...[
@@ -139,6 +156,29 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickYear(BuildContext context) async {
+    final current = _calendarMonth.year;
+    final years = List.generate(20, (i) => current - 10 + i);
+    final picked = await showDialog<int>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: const Text('Select year'),
+        children: years.map((y) => SimpleDialogOption(
+          onPressed: () => Navigator.pop(ctx, y),
+          child: Text(
+            '$y',
+            style: TextStyle(
+              fontWeight: y == current ? FontWeight.w700 : FontWeight.normal,
+            ),
+          ),
+        )).toList(),
+      ),
+    );
+    if (picked != null) {
+      setState(() => _calendarMonth = DateTime(picked, _calendarMonth.month));
+    }
   }
 }
 
@@ -211,13 +251,25 @@ Widget _habitFrequencyRow(String label, int count, int total, Color color, Theme
 // ── Calendar ───────────────────────────────────────────────────────────────────
 
 class _CalendarView extends StatelessWidget {
-  const _CalendarView({required this.theme, required this.month, required this.daysWithEntries, required this.onPrev, required this.onNext});
+  const _CalendarView({
+    required this.theme,
+    required this.month,
+    required this.daysWithEntries,
+    required this.onPrev,
+    required this.onNext,
+    required this.onYearPick,
+    required this.onDayTap,
+    this.selectedDay,
+  });
 
   final ThemeData theme;
   final DateTime month;
   final Set<DateTime> daysWithEntries;
   final VoidCallback onPrev;
   final VoidCallback onNext;
+  final VoidCallback onYearPick;
+  final ValueChanged<DateTime> onDayTap;
+  final DateTime? selectedDay;
 
   @override
   Widget build(BuildContext context) {
@@ -239,10 +291,19 @@ class _CalendarView extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(_formatMonthYear(month), style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+            GestureDetector(
+              onTap: onYearPick,
+              child: Row(
+                children: [
+                  Text(_formatMonthYear(month), style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(width: 4),
+                  Icon(Icons.arrow_drop_down, size: 18, color: cs.onSurfaceVariant),
+                ],
+              ),
+            ),
             const Spacer(),
             GestureDetector(onTap: onPrev, child: Icon(Icons.chevron_left, size: 20, color: cs.onSurfaceVariant)),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
             GestureDetector(onTap: onNext, child: Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant)),
           ],
         ),
@@ -262,35 +323,40 @@ class _CalendarView extends StatelessWidget {
           children: cells.map((date) {
             if (date == null) return const SizedBox.shrink();
             final isToday = date.year == today.year && date.month == today.month && date.day == today.day;
+            final isSelected = selectedDay == date;
             final hasEntry = daysWithEntries.contains(date);
-            return Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isToday ? cs.primary : Colors.transparent,
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    '${date.day}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: isToday ? cs.onPrimary : cs.onSurface,
-                      fontWeight: isToday ? FontWeight.w700 : FontWeight.normal,
-                    ),
-                  ),
-                  if (hasEntry && !isToday)
-                    Positioned(
-                      bottom: 4,
-                      child: Container(
-                        width: 4,
-                        height: 4,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xFFFFA726),
-                        ),
+            return GestureDetector(
+              onTap: () => onDayTap(date),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected
+                      ? cs.primaryContainer
+                      : isToday
+                          ? cs.primary
+                          : Colors.transparent,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      '${date.day}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isToday ? cs.onPrimary : isSelected ? cs.onPrimaryContainer : cs.onSurface,
+                        fontWeight: (isToday || isSelected) ? FontWeight.w700 : FontWeight.normal,
                       ),
                     ),
-                ],
+                    if (hasEntry && !isToday && !isSelected)
+                      Positioned(
+                        bottom: 4,
+                        child: Container(
+                          width: 4,
+                          height: 4,
+                          decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFA726)),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             );
           }).toList(),
@@ -337,6 +403,46 @@ class _TimelineEntry extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Selected day entries ───────────────────────────────────────────────────────
+
+class _SelectedDayEntries extends StatelessWidget {
+  const _SelectedDayEntries({required this.theme, required this.day, required this.entries, required this.cs, this.goalStore});
+
+  final ThemeData theme;
+  final DateTime day;
+  final List entries;
+  final ColorScheme cs;
+  final GoalStore? goalStore;
+
+  @override
+  Widget build(BuildContext context) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final label = '${months[day.month - 1]} ${day.day}, ${day.year}';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: theme.textTheme.labelMedium?.copyWith(color: cs.onSurfaceVariant, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 10),
+        if (entries.isEmpty)
+          Text('No journal entries on this day.', style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant))
+        else
+          ...entries.map((e) {
+            final linkedGoal = goalStore?.goals.where((g) => g.id == e.goalId).firstOrNull;
+            return _TimelineEntry(
+              theme: theme,
+              title: e.title,
+              date: '',
+              preview: e.content,
+              accentColor: linkedGoal?.category.color ?? cs.primary,
+              goalLabel: linkedGoal?.title,
+            );
+          }),
+      ],
     );
   }
 }
